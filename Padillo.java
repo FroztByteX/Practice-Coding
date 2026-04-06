@@ -75,7 +75,7 @@ public class Padillo {
 			System.out.println();
 		}
 
-		// finds the index of #1 and change its value to 50
+		// changes all values in 2ND row into 0's
 		for (int x = 0; x < numbers.length; x++) {
 			for (int y = 0; y < numbers[x].length; y++) {
 					numbers[1][y] = 0;
