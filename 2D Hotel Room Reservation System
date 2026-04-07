@@ -1,0 +1,117 @@
+package padillo;
+
+import java.util.Scanner;
+
+public class Padillo {
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+
+		int hotel[][] = new int[7][5];
+
+		boolean valid = true;
+
+		System.out.println("=================================="
+				+ "\n     HOTEL RESERVATION SYSTEM"
+				+ "\n==================================");
+
+		while (valid) {
+			System.out.println("MENU:"
+					+ "\n[1] View Rooms" 
+					+ "\n[2] Check In" 
+					+ "\n[3] Check Out" 
+					+ "\n[4] Exit");
+			System.out.print("Enter choice: ");
+			int choice = sc.nextInt();
+			System.out.println("==================================");
+
+			switch (choice) {
+			case 1:
+				System.out.println("\n============= ROOMS =============="
+						+ "\n0 = available    1 = occupied\n");
+				System.out.print("          ");
+				for (int y = 0; y < hotel[0].length; y++) {
+					System.out.print(y+1 + "  ");
+				}
+				System.out.print("- Room\n");
+				
+				for (int x = 0; x < hotel.length; x++) {
+					System.out.print("Floor " + (x + 1) + ": ");
+					for (int y = 0; y < hotel[x].length; y++) {
+						System.out.print("[" + hotel[x][y] + "]");
+					}
+					System.out.println();
+				}
+				
+				System.out.println("==================================");
+
+				break;
+				
+			case 2:
+				boolean repeat = false;
+				System.out.println("CHECK-IN");
+				
+				do {
+					System.out.print("Enter floor (1-7): ");
+					int floor = sc.nextInt();
+
+					System.out.print("Enter room (1-5): ");
+					int room = sc.nextInt();
+
+					if (floor>=1 && floor<=7 && room>=1 && room<=5) {
+						if (hotel[floor-1][room-1] == 0) {
+							hotel[floor-1][room-1] = 1;
+							System.out.println("\nCheck-in successful!"
+									+ "\n==================================");
+							repeat = true;
+						} else {
+							System.err.println("[Room already occupied.]\nPlease select another one!");
+						}
+					} else {
+						System.err.println("Invalid floor/room number.");
+					}
+
+				} while (!repeat);
+
+				break;
+				
+			case 3:
+				boolean repeat2 = false;
+				System.out.println("CHECK-OUT");
+
+				do {
+					System.out.print("Enter floor (1-7): ");
+					int floor = sc.nextInt();
+
+					System.out.print("Enter room (1-5): ");
+					int room = sc.nextInt();
+
+					if (floor>=1 && floor<=7 && room>=1 && room<=5) {
+						if (hotel[floor-1][room-1] == 1) {
+							hotel[floor-1][room-1] = 0;
+							System.out.println("\nCheck-out successful!"
+									+ "\n==================================");
+							repeat2 = true;
+						} else {
+							System.err.println("[Room already empty.]\nPlease select another one!");
+						}
+					} else {
+						System.err.println("Invalid floor/room number.");
+					}
+
+				} while (!repeat2);
+
+				break;
+				
+			case 4:
+				System.out.println("Thank you for booking with us!\nENJOY YOUR STAY!");
+				System.out.println("==================================");
+				valid = false;
+				break;
+				
+			default:
+				System.err.println("[Invalid choice! Please try again.]");
+			}
+		}
+	}
+}
