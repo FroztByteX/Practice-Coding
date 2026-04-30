@@ -1,0 +1,177 @@
+import javax.swing.*;
+import java.io.*;
+import java.util.*;
+
+public class Padillo {
+
+	public static void main(String[] args) {
+		ArrayList<String[]> feedbackList = new ArrayList<>();
+		int[] ratingCounts = new int[5];
+		int totalRating = 0;
+
+		JOptionPane.showMessageDialog(null, "WELCOME!\n\nPress OK to start.", "Student Feedback System",
+				JOptionPane.INFORMATION_MESSAGE);
+
+		boolean continueInput = true;
+
+		while (continueInput) {
+			String studentName = JOptionPane.showInputDialog(null, "Enter Student Name:", "Student Feedback System",
+					JOptionPane.QUESTION_MESSAGE);
+
+			if (studentName == null || studentName.trim().isEmpty()) {
+				showError("Student name cannot be empty. Please try again.");
+				continue;
+			}
+
+			String course = JOptionPane.showInputDialog(null, "Enter Course/Subject:", "Student Feedback System",
+					JOptionPane.QUESTION_MESSAGE);
+
+			if (course == null || course.trim().isEmpty()) {
+				showError("Course cannot be empty. Please try again.");
+				continue;
+			}
+
+			String feedbackMessage = JOptionPane.showInputDialog(null, "Enter Feedback Message:",
+					"Student Feedback System", JOptionPane.QUESTION_MESSAGE);
+
+			if (feedbackMessage == null || feedbackMessage.trim().isEmpty()) {
+				showError("Feedback message cannot be empty. Please try again.");
+				continue;
+			}
+
+			int rating = 0;
+			boolean validRating = false;
+
+			while (!validRating) {
+				String ratingInput = JOptionPane.showInputDialog(
+						null, "\nEnter Rating (1-5):" + "\n5 = Excellent" + "\n4 = Good" + "\n3 = Average"
+								+ "\n2 = Poor" + "\n1 = Very Poor",
+						"Student Feedback System", JOptionPane.QUESTION_MESSAGE);
+
+				try {
+					rating = Integer.parseInt(ratingInput.trim());
+					if (rating >= 1 && rating <= 5) {
+						validRating = true;
+					} else {
+						showError("Please enter a rating from 1 to 5.");
+					}
+				} catch (NumberFormatException e) {
+					showError("Please enter a valid number.");
+				}
+			}
+
+			String entry[] = { studentName.trim(), course.trim(), feedbackMessage.trim(), String.valueOf(rating) };
+			feedbackList.add(entry);
+
+			totalRating += rating;
+			ratingCounts[rating - 1]++;
+
+			int choice = JOptionPane.showConfirmDialog(null,
+					"Feedback recorded successfully!\n\nWant to add another feedback?", "Continue?",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+			continueInput = (choice == JOptionPane.YES_OPTION);
+		}
+
+		int totalFeedbacks = feedbackList.size();
+		double averageRating = (double) totalRating / totalFeedbacks;
+
+		try {
+			writeToFile(feedbackList, totalFeedbacks, averageRating, ratingCounts);
+			String resultsMessage = getMessage(totalFeedbacks, averageRating, ratingCounts);
+			JOptionPane.showMessageDialog(null, resultsMessage, "Feedback Summary", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "All feedback has been saved to 'feedback.txt' successfully!",
+					"File Saved", JOptionPane.INFORMATION_MESSAGE);
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Error saving to file: " + e.getMessage(), "File Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public static void showError(String message) {
+		JOptionPane.showMessageDialog(null, message, "Input Error", JOptionPane.ERROR_MESSAGE);
+	}
+
+	public static void writeToFile(List<String[]> feedbackList, int totalFeedbacks, double averageRating,
+			int[] ratingCounts) throws IOException {
+
+		try {
+			FileWriter fw = new FileWriter("feedback.txt", false);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write("=== Student Feedback Records ===\n");
+
+			for (String[] entry : feedbackList) {
+				bw.write("\nStudent Name: " + entry[0]);
+				bw.write("\nCourse: " + entry[1]);
+				bw.write("\nFeedback: " + entry[2]);
+				int rating = Integer.parseInt(entry[3]);
+				bw.write("\nRating: " + rating + " (" + getRatingCategory(rating) + ")");
+				bw.newLine();
+			}
+
+			bw.newLine();
+			bw.write("==========================");
+			bw.write("\nTotal Feedbacks: " + totalFeedbacks);
+			bw.write(String.format("\nAverage Rating: %.1f", averageRating));
+			bw.write("\nRemarks: " + getOverallFeedbackMessage(averageRating));
+			bw.write("\n\nRating Summary:");
+			bw.write("\nExcellent: " + ratingCounts[4]);
+			bw.write("\nGood: " + ratingCounts[3]);
+			bw.write("\nAverage: " + ratingCounts[2]);
+			bw.write("\nPoor: " + ratingCounts[1]);
+			bw.write("\nVery Poor: " + ratingCounts[0]);
+			bw.write("\n==========================");
+			bw.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static String getMessage(int totalFeedbacks, double averageRating, int[] ratingCounts) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("===== FEEDBACK SUMMARY =====\n\n");
+		sb.append("Total Feedbacks: ").append(totalFeedbacks);
+		sb.append(String.format("\nAverage Rating: %.1f", averageRating));
+		sb.append("\nRemarks: ").append(getOverallFeedbackMessage(averageRating));
+		sb.append("\n\nRating Summary:");
+		sb.append("\n- (5)Excellent: ").append(ratingCounts[4]);
+		sb.append("\n- (4)Good: ").append(ratingCounts[3]);
+		sb.append("\n- (3)Average: ").append(ratingCounts[2]);
+		sb.append("\n- (2)Poor: ").append(ratingCounts[1]);
+		sb.append("\n- (1)Very Poor: ").append(ratingCounts[0]);
+		sb.append("\n============================\n");
+		return sb.toString();
+	}
+
+	public static String getRatingCategory(int rating) {
+		switch (rating) {
+		case 5:
+			return "Excellent";
+		case 4:
+			return "Good";
+		case 3:
+			return "Average";
+		case 2:
+			return "Poor";
+		case 1:
+			return "Very Poor";
+		default:
+			return "";
+		}
+	}
+
+	public static String getOverallFeedbackMessage(double averageRating) {
+		if (averageRating >= 4.5) {
+			return "Outstanding Feedback!";
+		} else if (averageRating >= 3.5) {
+			return "Good Feedback!";
+		} else if (averageRating >= 2.5) {
+			return "Average Feedback";
+		} else {
+			return "Needs Improvement";
+		}
+	}
+
+}
