@@ -7,14 +7,14 @@ import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.table.DefaultTableModel;
 
-public class StudentForm extends JFrame {
+public class StudentInfoForm extends JFrame {
 
 	JTextField tfName, tfCourse, tfSection;
 	JTable table;
 	DefaultTableModel model;
 	JScrollPane scrollPane;
 
-	StudentForm() {
+	StudentInfoForm() {
 		setTitle("Student Information Form");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(445, 420);
@@ -253,7 +253,7 @@ public class StudentForm extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new StudentForm();
+		new StudentInfoForm();
 	}
 
 }
